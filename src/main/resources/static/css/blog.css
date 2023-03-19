@@ -1,0 +1,17 @@
+.section1 {
+    width: 80%;
+}
+
+.section2 {
+    width: 20%;
+}
+
+#tbBlogList, #tbBlogList tr, #tbBlogList td {
+    border: 1px solid lightgray;
+}
+
+#blogListPaging li {
+    list-style: none;
+    display: inline;
+    margin: 10px;
+}

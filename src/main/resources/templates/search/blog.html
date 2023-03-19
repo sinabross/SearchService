@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Blog Page</title>
+    <link rel="stylesheet" href="/css/blog.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+    <script src="/js/searchBlog.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        var query = "";
+        var sort = "";
+        var size = 10;
+
+        $(document).ready(function() {
+            $(document.body).on("click", "#btnSearchBlog", function(){
+                query = $("input[name='query']").val();
+                blogList(1);
+            });
+
+            $(document.body).on("click", "#btnSortAccuracy", function(){
+                query = $("input[name='query']").val();
+                sort = "accuracy";
+                blogList(1);
+            });
+
+            $(document.body).on("click", "#btnSortRecency", function(){
+                query = $("input[name='query']").val();
+                sort = "recency";
+                blogList(1);
+            });
+        });
+        function blogList(page) {
+
+            $.ajax({
+                type: "get",
+                url: "/search/blog?query=" + query + "&page=" + page + "&sort=" + sort + "&size=" + size,
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                cache: false,
+                success:function(response) {
+
+                    var res = JSON.parse(response);
+                    var list = res.documents;
+                    var totalPages = res.meta.total_count;
+                    var pageCount = size;
+                    var body = '';
+
+                    if(list.length > 0){
+
+                        for(var i=0; i<list.length; i++){
+
+                            var data = list[i];
+
+                            body += '<tr>';
+                            body += '   <td>' + data.title + '</td>';
+                            body += '   <td>' + data.contents + '</td>';
+                            body += '   <td>' + data.url + '</td>';
+                            body += '   <td>' + data.blogname + '</td>';
+                            body += '   <td>' + data.thumbnail + '</td>';
+                            body += '   <td>' + data.datetime +'</td>';
+                            body += '</tr>';
+                        }
+
+                    }else{
+
+                        body += '<tr>';
+                        body += '<td colspan="20" style="text-align:center">검색 결과가 없습니다.</td>';
+                        body += '<tr>';
+
+                    }
+                    $('#blogList').html(body);
+                    paging(totalPages, pageCount, page);
+                },
+                error:function(response, status, error) {
+                    alert("검색 결과를 불러올 수 없습니다.");
+                }
+            }); //.end ajax
+
+        } //.end blogList
+
+        function paging (totalPage, pageCount, currentPage){
+
+            var totalPage; // 총 페이지 수
+            var pageGroup = Math.ceil(currentPage/pageCount);    // 페이지 그룹
+
+            var last = pageGroup * pageCount;    // 화면에 보여질 마지막 페이지 번호
+            if(last > totalPage){
+                last = totalPage;
+            }
+            var first = last - (pageCount-1);    // 화면에 보여질 첫번째 페이지 번호
+            if(first < 0){
+                first = 1;
+            }
+            var next = last+1;
+            var prev = first-1;
+
+            var html = '<ul class="pagination">';
+            if(prev > 0){
+                html += '<li class="page-item"><a class="page-link" href="javascript:blogList(' + prev + ')" id="prev">Previous</a></li>';
+            }
+
+            for(var i=first; i<=last; i++){
+                if(i != currentPage){
+                    html += '<li class="page-item"><a class="page-link" href="javascript:blogList(' + i + ')" id="'+i+'">'+i+'</a></li>';
+                }else{
+                    html += '<li class="page-item active"><a class="page-link" href="javascript:blogList(' + i + ')" id="'+i+'">'+i+'</a></li>';
+                }
+            }
+
+            if(last < totalPage){
+                html += '<li class="page-item"><a class="page-link" href="javascript:blogList(' + next + ')" id="next">Next</a></li>';
+            }
+            html += '</ul>';
+
+            $("#blogListPaging").html(html);
+
+        } //.end paging
+
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>블로그 검색</h1>
+        <section class="section1">
+            <form action="/search/blog" method="get" onSubmit="return false;">
+                <input type="text" name="query" class="input_search_blog" id="inputSearchBlog">
+                <input type="submit" class="btn_search_blog" id="btnSearchBlog" value="검색">
+            </form>
+            <button id="btnSortAccuracy">정확도순</button>
+            <button id="btnSortRecency">최신순</button>
+
+            <table id="tbBlogList">
+                <thead>
+                    <tr>
+                        <td>title</td>
+                        <td>contents</td>
+                        <td>url</td>
+                        <td>blogname</td>
+                        <td>thumbnail</td>
+                        <td>datetime</td>
+                    </tr>
+                </thead>
+                <tbody id="blogList">
+                </tbody>
+            </table>
+            <div id="blogListPaging"></div>
+        </section>
+        <section class="section2">
+            <h3>인기 검색어 목록</h3>
+        </section>
+    </div>
+</body>
+</html>
