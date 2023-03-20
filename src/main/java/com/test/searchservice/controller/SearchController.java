@@ -1,5 +1,6 @@
 package com.test.searchservice.controller;
 
+import com.test.searchservice.domain.Keyword;
 import com.test.searchservice.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/search/")
 @RequiredArgsConstructor
+@RequestMapping("/search/")
 public class SearchController {
     private final WebClient kakaoWebClient;
 
@@ -30,9 +33,15 @@ public class SearchController {
                     return response.bodyToMono(String.class);
                 });
 
-        searchService.saveKeyword(query);
-
         return mono;
+    }
+
+    @GetMapping("/blog/keyword")
+    public List<Keyword> getPopularKeyword(String query) {
+        searchService.saveKeyword(query);
+        List<Keyword> keywordList = searchService.getPopularKeyword();
+
+        return keywordList;
     }
 
 }

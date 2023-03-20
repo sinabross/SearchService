@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SearchService {
 
@@ -28,8 +30,18 @@ public class SearchService {
             keyword.setCnt(keywordCnt);
             searchRepository.save(keyword);
         }else{
-            searchRepository.save(query);
+            Keyword word = new Keyword();
+            word.setKeyword(query);
+            word.setCnt(Long.valueOf(1));
+
+            searchRepository.save(word);
         }
 
     }
+
+    public List<Keyword> getPopularKeyword(){
+        List<Keyword> keywordList = searchRepository.findFirst10ByOrderByCntDesc();
+        return keywordList;
+    }
+
 }
