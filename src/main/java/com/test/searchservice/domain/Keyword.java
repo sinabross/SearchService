@@ -11,8 +11,10 @@ public class Keyword {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long idx;
+
     @Column(nullable = false)
     private String keyword;
+
     @Column
     private Long cnt;
 }
