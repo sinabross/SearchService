@@ -2,8 +2,6 @@ package com.test.searchservice.controller;
 
 import com.test.searchservice.domain.Keyword;
 import com.test.searchservice.service.SearchService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -39,7 +37,7 @@ public class SearchController {
     }
 
     @GetMapping("/blog/keyword")
-    public List<Keyword> getPopularKeyword(@NotEmpty String query) {
+    public List<Keyword> getPopularKeyword(String query) {
         searchService.saveKeyword(query);
         List<Keyword> keywordList = searchService.getPopularKeyword();
 

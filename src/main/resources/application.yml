@@ -11,14 +11,15 @@ spring:
 
   jpa:
     show-sql: true
+    generate-ddl: true
     database: h2
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       format_sql: true
       use_sql_comments: true
-    generate-ddl: true
+
 
 logging:
   level:
